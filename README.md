@@ -8,12 +8,12 @@ A Sudoku Game which written in Flutter.
 
 ## ToDo
 
-- Sudoku
- * Different size of board
- * Background music
- * Change the icons
- * Themes: light & dark
- * Animation of start a page
- * Improve unit test
+* Sudoku
+ - Different size of board
+ - Background music
+ - Change the icons
+ - Themes: light & dark
+ - Animation of start a page
+ - Improve unit test
 
-- Kenken Game [Wiki](https://en.wikipedia.org/wiki/KenKen)
+* Kenken Game [Wiki](https://en.wikipedia.org/wiki/KenKen)
