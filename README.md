@@ -2,6 +2,8 @@
 
 A Sudoku Game which written in Flutter.
 
+[Play Online](https://sudoku-app-b530d.web.app/)
+
 ## Features
 
 - Classical Sudoku Game
