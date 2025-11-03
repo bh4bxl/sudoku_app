@@ -6,7 +6,11 @@ A Sudoku Game which written in Flutter.
 
 ## Features
 
-- Classical Sudoku Game
+1. Classical Sudoku Game
+
+Functions:
+
+- Themes: Light and Dark
 
 ## ToDo
 
@@ -14,7 +18,6 @@ A Sudoku Game which written in Flutter.
  - Different size of board
  - Background music
  - Change the icons
- - Themes: light & dark
  - Animation of start a page
  - Improve unit test
 

@@ -4,24 +4,65 @@ import 'package:sudoku_app/sudoku.dart';
 
 void main() => runApp(const SudokuApp());
 
-class SudokuApp extends StatelessWidget {
+class SudokuApp extends StatefulWidget {
   const SudokuApp({super.key});
+
+  @override
+  State<SudokuApp> createState() => _SudokuAppState();
+}
+
+class _SudokuAppState extends State<SudokuApp> {
+  ThemeMode _themeMode = ThemeMode.light;
+
+  void _toggleTheme() {
+    setState(() {
+      _themeMode = _themeMode == ThemeMode.light ? ThemeMode.dark : ThemeMode.light;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Sudoku',
+      themeMode: _themeMode,
       theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         useMaterial3: true,
+        colorScheme: ColorScheme.fromSeed(
+          seedColor: Colors.deepPurple,
+          brightness: Brightness.light,
+          primary: Colors.black, // text color, line of board
+          onPrimary: Colors.white, // board background
+          secondary: Colors.blue, // selected text color
+          onSecondary: Colors.grey.shade200, // fixed board background, select bar button background
+          onSecondaryFixed: Colors.grey[400], // disabled button background
+          onSecondaryContainer: Colors.amber, // selecetd button background
+          error: Colors.red, // error text color
+        ),
       ),
-      home: const HomePage(),
+      darkTheme: ThemeData(
+        useMaterial3: true,
+        colorScheme: ColorScheme.fromSeed(
+          seedColor: Colors.purple,
+          brightness: Brightness.dark,
+          primary: Colors.white,
+          onPrimary: Colors.blueGrey,
+          secondary: Colors.lightBlue,
+          onSecondary: Colors.grey[1000],
+          onSecondaryFixed: Colors.grey[800],
+          onSecondaryContainer: Colors.amber[900],
+          error: Colors.red,
+        ),
+      ),
+      home: HomePage(onToggleTheme: _toggleTheme, themeMode: _themeMode),
     );
   }
 }
 
 class HomePage extends StatefulWidget {
-  const HomePage({super.key});
+  final VoidCallback onToggleTheme;
+  final ThemeMode themeMode;
+
+  const HomePage({super.key, required this.onToggleTheme, required this.themeMode});
 
   @override
   State<HomePage> createState() => _HomePageState();
@@ -46,14 +87,20 @@ class _HomePageState extends State<HomePage> {
       Difficulty.hard => 'Hard',
       Difficulty.expert => 'Expert',
     };
-    var textStyle = TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.white);
+    var textStyle = TextStyle(fontSize: 20, fontWeight: FontWeight.bold);
     return ElevatedButton(
       key: Key(text),
       style: levelBtnStyle,
       onPressed: () {
         Navigator.push(
           context,
-          MaterialPageRoute(builder: (context) => BoardPage(difficulty: difficulty)),
+          MaterialPageRoute(
+            builder: (context) => BoardPage(
+              onToggleTheme: widget.onToggleTheme,
+              themeMode: widget.themeMode,
+              difficulty: difficulty,
+            ),
+          ),
         );
       },
       child: Align(
@@ -66,7 +113,15 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Sudoku')),
+      appBar: AppBar(
+        title: const Text('Sudoku'),
+        actions: [
+          IconButton(
+            onPressed: widget.onToggleTheme,
+            icon: Icon(widget.themeMode == ThemeMode.light ? Icons.dark_mode : Icons.light_mode),
+          ),
+        ],
+      ),
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.start,

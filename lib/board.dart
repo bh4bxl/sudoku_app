@@ -6,8 +6,15 @@ import 'package:sudoku_app/sudoku.dart';
 import 'dart:developer' as developer;
 
 class BoardPage extends StatefulWidget {
+  final VoidCallback onToggleTheme;
+  final ThemeMode themeMode;
   final Difficulty difficulty;
-  const BoardPage({super.key, required this.difficulty});
+  const BoardPage({
+    super.key,
+    required this.onToggleTheme,
+    required this.themeMode,
+    required this.difficulty,
+  });
   @override
   State<BoardPage> createState() => _BoardPageState();
 }
@@ -73,7 +80,8 @@ class _BoardPageState extends State<BoardPage> {
     });
   }
 
-  Widget _buildCell(int r, int c) {
+  Widget _buildCell(BuildContext context, int r, int c) {
+    final colors = Theme.of(context).colorScheme;
     bool given = _sudoku.puzzle[r][c] != 0;
     int val = _user[r][c];
     bool isHighlighted = _user[r][c] == _selectNumber;
@@ -170,15 +178,18 @@ class _BoardPageState extends State<BoardPage> {
       child: Container(
         decoration: BoxDecoration(
           border: Border(
-            top: BorderSide(width: r % _sudoku.boxSize == 0 ? 2 : 0.5, color: Colors.black),
-            left: BorderSide(width: c % _sudoku.boxSize == 0 ? 2 : 0.5, color: Colors.black),
-            right: BorderSide(width: (c + 1) % _sudoku.boxSize == 0 ? 2 : 0.5, color: Colors.black),
+            top: BorderSide(width: r % _sudoku.boxSize == 0 ? 2 : 0.5, color: colors.primary),
+            left: BorderSide(width: c % _sudoku.boxSize == 0 ? 2 : 0.5, color: colors.primary),
+            right: BorderSide(
+              width: (c + 1) % _sudoku.boxSize == 0 ? 2 : 0.5,
+              color: colors.primary,
+            ),
             bottom: BorderSide(
               width: (r + 1) % _sudoku.boxSize == 0 ? 2 : 0.5,
-              color: Colors.black,
+              color: colors.primary,
             ),
           ),
-          color: given ? Colors.grey.shade200 : Colors.white,
+          color: given ? colors.onSecondary : colors.onPrimary,
         ),
         alignment: Alignment.center,
         child: Text(
@@ -187,23 +198,24 @@ class _BoardPageState extends State<BoardPage> {
             fontSize: 16,
             fontWeight: given ? FontWeight.bold : FontWeight.w400,
             color: val != _sudoku.solution[r][c]
-                ? Colors.red
+                ? colors.error
                 : isHighlighted
-                ? Colors.blue
-                : Colors.black,
+                ? colors.secondary
+                : colors.primary,
           ),
         ),
       ),
     );
   }
 
-  Widget _buildBoard() {
-    return Expanded(
-      child: AspectRatio(
-        aspectRatio: 1,
+  Widget _buildBoard(BuildContext context) {
+    final colors = Theme.of(context).colorScheme;
+    return Center(
+      child: SizedBox.square(
+        dimension: 350,
         child: Container(
           margin: const EdgeInsets.all(12),
-          decoration: BoxDecoration(border: Border.all(width: 2, color: Colors.black)),
+          decoration: BoxDecoration(border: Border.all(width: 2, color: colors.primary)),
           child: GridView.builder(
             physics: const NeverScrollableScrollPhysics(),
             gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 9),
@@ -211,7 +223,7 @@ class _BoardPageState extends State<BoardPage> {
             itemBuilder: (context, index) {
               int r = index ~/ _sudoku.size;
               int c = index % _sudoku.size;
-              return _buildCell(r, c);
+              return _buildCell(context, r, c);
             },
           ),
         ),
@@ -219,7 +231,8 @@ class _BoardPageState extends State<BoardPage> {
     );
   }
 
-  Widget _buildNumsBar() {
+  Widget _buildNumsBar(BuildContext context) {
+    final colors = Theme.of(context).colorScheme;
     return SizedBox(
       height: 80, // adjust for spacing
       width: 360,
@@ -239,12 +252,12 @@ class _BoardPageState extends State<BoardPage> {
             child: Container(
               decoration: BoxDecoration(
                 color: isSelected
-                    ? Colors.amber
+                    ? colors.onSecondaryContainer
                     : _usedNumbers[number - 1] == _sudoku.size
-                    ? Colors.grey
-                    : Colors.grey[200],
+                    ? colors.onSecondaryFixed
+                    : colors.onSecondary,
                 borderRadius: BorderRadius.circular(8),
-                border: Border.all(color: Colors.black87, width: 1),
+                border: Border.all(color: colors.primary, width: 1),
               ),
               child: Center(
                 child: RichText(
@@ -252,7 +265,7 @@ class _BoardPageState extends State<BoardPage> {
                     children: [
                       TextSpan(
                         text: number.toString(),
-                        style: TextStyle(color: Colors.black, fontWeight: FontWeight.w600),
+                        style: TextStyle(color: colors.primary, fontWeight: FontWeight.w600),
                       ),
                       WidgetSpan(
                         alignment: PlaceholderAlignment.top,
@@ -293,6 +306,12 @@ class _BoardPageState extends State<BoardPage> {
           },
           icon: const Icon(Icons.arrow_back),
         ),
+        actions: [
+          IconButton(
+            onPressed: widget.onToggleTheme,
+            icon: Icon(widget.themeMode == ThemeMode.light ? Icons.dark_mode : Icons.light_mode),
+          ),
+        ],
       ),
       body: Center(
         child: Column(
@@ -315,13 +334,13 @@ class _BoardPageState extends State<BoardPage> {
               ),
             ),
             const SizedBox(height: 4),
-            _buildBoard(),
+            _buildBoard(context),
             const SizedBox(height: 16),
             Padding(
               padding: EdgeInsets.symmetric(horizontal: 12.0, vertical: 8.0),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
-                children: [Center(child: _buildNumsBar())],
+                children: [Center(child: _buildNumsBar(context))],
               ),
             ),
           ],
