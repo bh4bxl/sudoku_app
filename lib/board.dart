@@ -1,18 +1,21 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:sudoku_app/services/sfx_service.dart';
 import 'package:sudoku_app/sudoku.dart';
-
-import 'dart:developer' as developer;
 
 class BoardPage extends StatefulWidget {
   final VoidCallback onToggleTheme;
   final ThemeMode themeMode;
+  final VoidCallback onOffMusic;
+  final bool musicOn;
   final Difficulty difficulty;
   const BoardPage({
     super.key,
     required this.onToggleTheme,
     required this.themeMode,
+    required this.onOffMusic,
+    required this.musicOn,
     required this.difficulty,
   });
   @override
@@ -107,10 +110,13 @@ class _BoardPageState extends State<BoardPage> {
             if (_usedNumbers[_selectNumber - 1] == _sudoku.size) {
               _selectNumber = 0;
             }
+            var error = false;
             if (_sudoku.solution[r][c] != _user[r][c]) {
               _errotCount++;
-              developer.log('Errors: $_errotCount');
+              SfxService.instance.error();
+              error = true;
               if (_errotCount >= maxErrors) {
+                SfxService.instance.fail();
                 _timer.cancel();
                 _stopwatch.stop();
                 showDialog(
@@ -142,9 +148,11 @@ class _BoardPageState extends State<BoardPage> {
             }
             for (int i = 0; i < _sudoku.size; i++) {
               if (_usedNumbers[i] != _sudoku.size) {
+                if (!error) SfxService.instance.tap();
                 return;
               }
             }
+            SfxService.instance.complete();
             _timer.cancel();
             _stopwatch.stop();
             showDialog(
@@ -307,6 +315,10 @@ class _BoardPageState extends State<BoardPage> {
           icon: const Icon(Icons.arrow_back),
         ),
         actions: [
+          IconButton(
+            onPressed: widget.onOffMusic,
+            icon: Icon(widget.musicOn ? Icons.music_note : Icons.music_off),
+          ),
           IconButton(
             onPressed: widget.onToggleTheme,
             icon: Icon(widget.themeMode == ThemeMode.light ? Icons.dark_mode : Icons.light_mode),
