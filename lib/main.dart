@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:sudoku_app/board.dart';
+import 'package:sudoku_app/common_app_bar.dart';
 import 'package:sudoku_app/sudoku.dart';
 import 'package:sudoku_app/services/bgm_service.dart';
 import 'package:sudoku_app/services/sfx_service.dart';
+
+enum BgmAction { bgm1, bgm2, bgm3, bgm4, disable }
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -20,18 +23,10 @@ class SudokuApp extends StatefulWidget {
 
 class _SudokuAppState extends State<SudokuApp> {
   ThemeMode _themeMode = ThemeMode.light;
-  bool _musicOn = true;
 
   void _toggleTheme() {
     setState(() {
       _themeMode = _themeMode == ThemeMode.light ? ThemeMode.dark : ThemeMode.light;
-    });
-  }
-
-  void _onOffMusic() {
-    setState(() {
-      _musicOn = !_musicOn;
-      _musicOn ? BgmService.instance.play() : BgmService.instance.stop();
     });
   }
 
@@ -68,12 +63,7 @@ class _SudokuAppState extends State<SudokuApp> {
           error: Colors.red,
         ),
       ),
-      home: HomePage(
-        onToggleTheme: _toggleTheme,
-        themeMode: _themeMode,
-        onOffMusic: _onOffMusic,
-        musicOn: _musicOn,
-      ),
+      home: HomePage(onToggleTheme: _toggleTheme, themeMode: _themeMode),
     );
   }
 }
@@ -81,16 +71,8 @@ class _SudokuAppState extends State<SudokuApp> {
 class HomePage extends StatefulWidget {
   final VoidCallback onToggleTheme;
   final ThemeMode themeMode;
-  final VoidCallback onOffMusic;
-  final bool musicOn;
 
-  const HomePage({
-    super.key,
-    required this.onToggleTheme,
-    required this.themeMode,
-    required this.onOffMusic,
-    required this.musicOn,
-  });
+  const HomePage({super.key, required this.onToggleTheme, required this.themeMode});
 
   @override
   State<HomePage> createState() => _HomePageState();
@@ -100,7 +82,7 @@ class _HomePageState extends State<HomePage> {
   @override
   void initState() {
     super.initState();
-    BgmService.instance.play();
+    BgmService.instance.selectAndPlay(0);
   }
 
   Widget _buildLevelButton(BuildContext context, Difficulty difficulty) {
@@ -127,8 +109,6 @@ class _HomePageState extends State<HomePage> {
             builder: (context) => BoardPage(
               onToggleTheme: widget.onToggleTheme,
               themeMode: widget.themeMode,
-              onOffMusic: widget.onOffMusic,
-              musicOn: widget.musicOn,
               difficulty: difficulty,
             ),
           ),
@@ -144,18 +124,10 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Sudoku'),
-        actions: [
-          IconButton(
-            icon: Icon(widget.musicOn ? Icons.music_note : Icons.music_off),
-            onPressed: widget.onOffMusic,
-          ),
-          IconButton(
-            onPressed: widget.onToggleTheme,
-            icon: Icon(widget.themeMode == ThemeMode.light ? Icons.dark_mode : Icons.light_mode),
-          ),
-        ],
+      appBar: CommonAppBar(
+        title: 'Sudoku',
+        onToggleTheme: widget.onToggleTheme,
+        themeMode: widget.themeMode,
       ),
       body: Center(
         child: Column(

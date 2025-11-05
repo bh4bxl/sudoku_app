@@ -1,21 +1,20 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:sudoku_app/common_app_bar.dart';
+import 'package:sudoku_app/services/bgm_service.dart';
 import 'package:sudoku_app/services/sfx_service.dart';
 import 'package:sudoku_app/sudoku.dart';
 
 class BoardPage extends StatefulWidget {
   final VoidCallback onToggleTheme;
   final ThemeMode themeMode;
-  final VoidCallback onOffMusic;
-  final bool musicOn;
   final Difficulty difficulty;
+
   const BoardPage({
     super.key,
     required this.onToggleTheme,
     required this.themeMode,
-    required this.onOffMusic,
-    required this.musicOn,
     required this.difficulty,
   });
   @override
@@ -306,24 +305,10 @@ class _BoardPageState extends State<BoardPage> {
     };
 
     return Scaffold(
-      appBar: AppBar(
-        title: Text('Sudoku - $diffText'),
-        leading: IconButton(
-          onPressed: () {
-            Navigator.pop(context);
-          },
-          icon: const Icon(Icons.arrow_back),
-        ),
-        actions: [
-          IconButton(
-            onPressed: widget.onOffMusic,
-            icon: Icon(widget.musicOn ? Icons.music_note : Icons.music_off),
-          ),
-          IconButton(
-            onPressed: widget.onToggleTheme,
-            icon: Icon(widget.themeMode == ThemeMode.light ? Icons.dark_mode : Icons.light_mode),
-          ),
-        ],
+      appBar: CommonAppBar(
+        title: 'Sudoku - $diffText',
+        onToggleTheme: widget.onToggleTheme,
+        themeMode: widget.themeMode,
       ),
       body: Center(
         child: Column(
