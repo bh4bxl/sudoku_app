@@ -2,7 +2,6 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:sudoku_app/common_app_bar.dart';
-import 'package:sudoku_app/services/bgm_service.dart';
 import 'package:sudoku_app/services/sfx_service.dart';
 import 'package:sudoku_app/sudoku.dart';
 
